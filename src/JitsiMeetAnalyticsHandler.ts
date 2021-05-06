@@ -17,6 +17,11 @@ declare global {
         roomName: string,
         _room: {
           p2p: boolean,
+          rtc: {
+            peerConnections: Map<unknown, {
+              peerconnection: RTCPeerConnection,
+            }>,
+          },
           participants: {
             _id: string;
             _displayName: string,
@@ -102,6 +107,8 @@ export default class JitsiMeetAnalyticsHandler {
 
   _userPropertiesString: string;
 
+  userData: Record<string, unknown>;
+
   /**
      * Creates new instance of the custom handler.
      *
@@ -113,10 +120,27 @@ export default class JitsiMeetAnalyticsHandler {
     this._userProperties = {};
     this._enabled = true;
     this._userPropertiesString = '';
+    this.userData = {};
 
     this._statsInterval = window.setInterval(() => {
       this._sendStats();
     }, 2000);
+
+    window.addEventListener('message', (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (!data.type || data.type !== 'jitsi-meet-analytics-handler') {
+          return;
+        }
+
+        if (data.userData) {
+          this.userData = data.userData;
+        }
+        console.log('IFRAME; got event: ', event);
+      } catch (e) {
+        // do nothing
+      }
+    });
   }
 
   /**
@@ -137,12 +161,32 @@ export default class JitsiMeetAnalyticsHandler {
       return;
     }
 
+    let peerConnections: RTCPeerConnection[] = [];
+    if (
+      window.APP && window.APP.conference
+      && window.APP.conference._room
+      && window.APP.conference._room.rtc
+      && window.APP.conference._room.rtc.peerConnections
+    ) {
+      peerConnections = Array
+        .from(window.APP.conference._room.rtc.peerConnections.values())
+        .map((pc) => pc.peerconnection);
+    }
+
     const stats: StatisticsInput = {
       room: roomName,
       metadata: {
         user: roomInformations.user,
+        userData: this.userData,
       },
+      peerConnections,
     };
+
+    if (window.parent.location !== window.location) {
+      window.parent.postMessage(JSON.stringify({
+        type: 'jitsi-meet-analytics-handler',
+      }), '*');
+    }
 
     sendStats(stats);
   }
