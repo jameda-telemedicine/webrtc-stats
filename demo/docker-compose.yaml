@@ -1,0 +1,92 @@
+version: "3"
+
+services:
+  # serve static files (Jitsi Meet analytics handler)
+  static:
+    build: ./static
+    restart: unless-stopped
+    ports:
+      - 5000:5000
+    volumes:
+      - ../dist:/app
+
+  # iframe with Jitsi Meet inside
+  iframe:
+    build: ./iframe
+    restart: unless-stopped
+    ports:
+      - 5001:80
+
+  # backend collecting statistics
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+
+  # Jitsi Meet frontend
+  jitsi:
+    image: jitsi/web:stable-5765-1
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+      - "8443:443"
+    volumes:
+      - ./volumes/web:/config:Z
+      - ./volumes/transcripts:/usr/share/jitsi-meet/transcripts:Z
+      - ./jitsi/config.js:/defaults/config.js:ro
+    env_file: .env.jitsi
+    networks:
+      meet.jitsi:
+        aliases:
+          - meet.jitsi
+
+  # XMPP server
+  prosody:
+    image: jitsi/prosody:stable-5765-1
+    restart: unless-stopped
+    expose:
+      - "5222"
+      - "5347"
+      - "5280"
+    volumes:
+      - ./volumes/prosody/config:/config:Z
+      - ./volumes/prosody/prosody-plugins-custom:/prosody-plugins-custom:Z
+    env_file: .env.jitsi
+    networks:
+      meet.jitsi:
+        aliases:
+          - xmpp.meet.jitsi
+
+  # Focus component
+  jicofo:
+    image: jitsi/jicofo:stable-5765-1
+    restart: unless-stopped
+    volumes:
+      - ./volumes/jicofo:/config:Z
+    env_file: .env.jitsi
+    depends_on:
+      - prosody
+    networks:
+      meet.jitsi:
+
+  # video bridge
+  jvb:
+    image: jitsi/jvb:stable-5765-1
+    restart: unless-stopped
+    ports:
+      - "10000:10000/udp"
+      - "4443:4443"
+    volumes:
+      - ./volumes/jvb:/config:Z
+    env_file: .env.jitsi
+    depends_on:
+      - prosody
+    networks:
+      meet.jitsi:
+        aliases:
+          - jvb.meet.jitsi
+
+# custom network so all services can communicate using a FQDN
+networks:
+  meet.jitsi:

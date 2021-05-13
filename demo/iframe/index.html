@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      background-color: #212121;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+    }
+    a {
+      color: #fff;
+      font-style: italic;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Jitsi Meet Statistics Demo</h1>
+  <div id="meet"></div>
+  <p>If you are not seeing the iframe with a Jitsi Meet instance, please open <a href="https://localhost:8443/external_api.js" target="_blank">https://localhost:8443/external_api.js</a> and accept the default certificate, then refresh this page.</p>
+  <script src="https://localhost:8443/external_api.js"></script>
+  <script>
+    const randomId = Math.random().toString(16).substr(2, 8);
+    console.log('My user ID is: ', randomId);
+
+    const domain = 'localhost:8443';
+    const options = {
+      roomName: 'jitsi-meet-demo',
+      width: 700,
+      height: 700,
+      userInfo: {
+        displayName: "hello",
+        foo: "bar" // not working
+      },
+      parentNode: document.querySelector('#meet')
+    };
+    const api = new JitsiMeetExternalAPI(domain, options);
+
+    // https://developer.mozilla.org/fr/docs/Web/API/Window/postMessage
+    window.addEventListener('message', (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (!data.type || data.type !== 'jitsi-meet-analytics-handler') {
+          return;
+        }
+        console.log('got event: ', event);
+        
+        event.source.postMessage(JSON.stringify({
+          type: 'jitsi-meet-analytics-handler',
+          userData: {
+            userId: randomId,
+          }
+        }), event.origin);
+      } catch (e) {}
+    });
+  </script>
+</body>
+</html>
