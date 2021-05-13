@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */
@@ -109,6 +110,12 @@ export default class JitsiMeetAnalyticsHandler {
 
   userData: Record<string, unknown>;
 
+  backendWarningSent: boolean;
+
+  backendUrl?: string;
+
+  backendPostMessageType: string;
+
   /**
      * Creates new instance of the custom handler.
      *
@@ -122,20 +129,35 @@ export default class JitsiMeetAnalyticsHandler {
     this._userPropertiesString = '';
     this.userData = {};
 
+    this.backendWarningSent = false;
+    this.backendUrl = undefined;
+    this.backendPostMessageType = 'jitsi-meet-analytics-handler';
+
     this._statsInterval = window.setInterval(() => {
       this._sendStats();
     }, 2000);
 
+    console.info('Successfully loaded JitsiMeetAnalyticsHandler.');
+
     window.addEventListener('message', (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (!data.type || data.type !== 'jitsi-meet-analytics-handler') {
+        if (!data.type || data.type !== this.backendPostMessageType) {
           return;
         }
 
         if (data.userData) {
           this.userData = data.userData;
         }
+
+        if (data.backendUrl) {
+          this.backendUrl = data.backendUrl;
+        }
+
+        if (data.backendPostMessageType) {
+          this.backendPostMessageType = data.backendPostMessageType;
+        }
+
         console.log('IFRAME; got event: ', event);
       } catch (e) {
         // do nothing
@@ -184,8 +206,21 @@ export default class JitsiMeetAnalyticsHandler {
 
     if (window.parent.location !== window.location) {
       window.parent.postMessage(JSON.stringify({
-        type: 'jitsi-meet-analytics-handler',
+        type: this.backendPostMessageType,
       }), '*');
+    }
+
+    if (!this.backendUrl) {
+      if (!this.backendWarningSent) {
+        console.warn('JitsiMeetAnalyticsHandler disabled, no backendUrl set.');
+        this.backendWarningSent = true;
+      }
+      return;
+    }
+
+    if (this.backendWarningSent) {
+      console.info('JitsiMeetAnalyticsHandler enabled, got backendUrl.');
+      this.backendWarningSent = false;
     }
 
     sendStats(stats);

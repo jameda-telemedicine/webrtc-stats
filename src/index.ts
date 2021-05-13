@@ -37,8 +37,6 @@ const getStats = async (pc: RTCPeerConnection) => {
     };
   });
 
-  console.log('STATS', stats);
-
   return stats;
 };
 

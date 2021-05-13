@@ -25,6 +25,8 @@
   <p>If you are not seeing the iframe with a Jitsi Meet instance, please open <a href="https://localhost:8443/external_api.js" target="_blank">https://localhost:8443/external_api.js</a> and accept the default certificate, then refresh this page.</p>
   <script src="https://localhost:8443/external_api.js"></script>
   <script>
+    const backendPostMessageType = 'jitsi-meet-analytics-handler';
+
     const randomId = Math.random().toString(16).substr(2, 8);
     console.log('My user ID is: ', randomId);
 
@@ -45,16 +47,18 @@
     window.addEventListener('message', (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (!data.type || data.type !== 'jitsi-meet-analytics-handler') {
+        if (!data.type || data.type !== backendPostMessageType) {
           return;
         }
         console.log('got event: ', event);
         
         event.source.postMessage(JSON.stringify({
-          type: 'jitsi-meet-analytics-handler',
+          type: backendPostMessageType,
           userData: {
             userId: randomId,
-          }
+          },
+          backendUrl: 'http://localhost:3000',
+          backendPostMessageType,
         }), event.origin);
       } catch (e) {}
     });
