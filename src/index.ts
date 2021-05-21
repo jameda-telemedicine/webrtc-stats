@@ -1,3 +1,5 @@
+import { WebRTCStats } from '@peermetrics/webrtc-stats/src';
+
 export interface StatisticsInput {
   room: string,
   metadata: Record<string, unknown>,
@@ -45,20 +47,20 @@ const getStats = async (pc: RTCPeerConnection) => {
  *
  * @param stats statistics to send.
  */
-export const sendStats = async (stats: StatisticsInput): Promise<void> => {
+export const sendStats = async (backendUrl: string, stats: StatisticsInput): Promise<void> => {
   const roomName = stats.room;
 
   const pcStats = await Promise.all(stats.peerConnections.map((pc) => getStats(pc)));
 
-  fetch(`http://localhost:3000/${roomName}`, {
+  fetch(`${backendUrl}/${roomName}`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      metadata: stats.metadata,
-      stats: pcStats,
+      ...stats.metadata,
+      stats: pcStats.map((s) => s.items).flat(),
     }),
   });
 };

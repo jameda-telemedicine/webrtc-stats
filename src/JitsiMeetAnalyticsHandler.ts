@@ -108,7 +108,7 @@ export default class JitsiMeetAnalyticsHandler {
 
   _userPropertiesString: string;
 
-  userData: Record<string, unknown>;
+  metadata: Record<string, unknown>;
 
   backendWarningSent: boolean;
 
@@ -127,7 +127,7 @@ export default class JitsiMeetAnalyticsHandler {
     this._userProperties = {};
     this._enabled = true;
     this._userPropertiesString = '';
-    this.userData = {};
+    this.metadata = {};
 
     this.backendWarningSent = false;
     this.backendUrl = undefined;
@@ -146,8 +146,8 @@ export default class JitsiMeetAnalyticsHandler {
           return;
         }
 
-        if (data.userData) {
-          this.userData = data.userData;
+        if (data.metadata) {
+          this.metadata = data.metadata;
         }
 
         if (data.backendUrl) {
@@ -198,8 +198,9 @@ export default class JitsiMeetAnalyticsHandler {
     const stats: StatisticsInput = {
       room: roomName,
       metadata: {
-        user: roomInformations.user,
-        userData: this.userData,
+        ...this.metadata,
+        sessionId: roomInformations?.user?.id,
+        conferenceId: roomName,
       },
       peerConnections,
     };
@@ -223,7 +224,7 @@ export default class JitsiMeetAnalyticsHandler {
       this.backendWarningSent = false;
     }
 
-    sendStats(stats);
+    sendStats(this.backendUrl || '', stats);
   }
 
   /**
