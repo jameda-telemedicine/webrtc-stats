@@ -5,9 +5,10 @@ import { Client as ElasticClient } from '@elastic/elasticsearch';
 import { name as templateName, template } from './indexTemplate';
 import { createEntries, ElasticStatEntry, validateStatEntry } from './models';
 
-const port = 3000;
+// configuration using environment variables
+const port = process.env.BACKEND_PORT || 3000;
 const elasticClient = new ElasticClient({
-  node: 'http://localhost:9200',
+  node: process.env.ELASTIC_ENDPOINT || 'http://localhost:9200',
 });
 
 const ensureIndexTemplateExists = async () => {
@@ -18,6 +19,12 @@ const ensureIndexTemplateExists = async () => {
 };
 
 const sendEntries = async (entries: ElasticStatEntry[], now: number) => {
+  // nothing to send to the backend
+  if (entries.length <= 0) {
+    return;
+  }
+
+  // create index based on the date
   const date = new Date(now);
   const year = date.getUTCFullYear();
   const month = 1 + date.getUTCMonth();
