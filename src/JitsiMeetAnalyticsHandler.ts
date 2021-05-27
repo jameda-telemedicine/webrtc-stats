@@ -112,6 +112,8 @@ export default class JitsiMeetAnalyticsHandler {
 
   backendWarningSent: boolean;
 
+  sessionIdWarningSent: boolean;
+
   backendUrl?: string;
 
   backendPostMessageType: string;
@@ -130,6 +132,7 @@ export default class JitsiMeetAnalyticsHandler {
     this.metadata = {};
 
     this.backendWarningSent = false;
+    this.sessionIdWarningSent = false;
     this.backendUrl = undefined;
     this.backendPostMessageType = 'jitsi-meet-analytics-handler';
 
@@ -222,6 +225,19 @@ export default class JitsiMeetAnalyticsHandler {
     if (this.backendWarningSent) {
       console.info('JitsiMeetAnalyticsHandler enabled, got backendUrl.');
       this.backendWarningSent = false;
+    }
+
+    if (!stats?.metadata?.sessionId) {
+      if (!this.sessionIdWarningSent) {
+        console.warn('No sessionId for the moment… JitsiMeetAnalyticsHandler is disabled.');
+        this.sessionIdWarningSent = true;
+      }
+      return;
+    }
+
+    if (this.sessionIdWarningSent) {
+      console.info('JitsiMeetAnalyticsHandler enabled, got a sessionId.');
+      this.sessionIdWarningSent = false;
     }
 
     sendStats(this.backendUrl || '', stats);
