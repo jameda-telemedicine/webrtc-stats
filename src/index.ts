@@ -1,5 +1,3 @@
-import { WebRTCStats } from '@peermetrics/webrtc-stats/src';
-
 export interface StatisticsInput {
   room: string,
   metadata: Record<string, unknown>,
