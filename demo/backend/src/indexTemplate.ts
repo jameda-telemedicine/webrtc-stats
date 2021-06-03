@@ -44,6 +44,27 @@ export const template = {
         'stat.id': {
           type: 'keyword',
         },
+        'stat.jitter': {
+          type: 'double',
+        },
+        'stat.packets.lost': {
+          type: 'long',
+        },
+        'stat.frame.height': {
+          type: 'long',
+        },
+        'stat.frame.width': {
+          type: 'long',
+        },
+        'session.browser.name': {
+          type: 'keyword',
+        },
+        'session.browser.version': {
+          type: 'keyword',
+        },
+        'session.os': {
+          type: 'keyword',
+        },
       },
     },
   },

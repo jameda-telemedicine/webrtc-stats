@@ -4,6 +4,7 @@
 import * as t from 'io-ts';
 import { isLeft } from 'fp-ts/Either';
 import { PathReporter } from 'io-ts/PathReporter';
+import useragent from 'express-useragent';
 
 export type TypeValidation<T> =
   | {
@@ -23,6 +24,14 @@ export type ElasticStatEntry = {
     kind: string;
     type: string;
     timestamp: number;
+    jitter?: number;
+    packets?: {
+      lost?: number;
+    };
+    frame?: {
+      height?: number;
+      width?: number;
+    };
   };
   conference: {
     id: string;
@@ -32,6 +41,11 @@ export type ElasticStatEntry = {
   };
   session: {
     id: string;
+    browser?: {
+      name?: string;
+      version?: string;
+    };
+    os?: string;
   };
   '@timestamp': number;
 };
@@ -44,6 +58,13 @@ const InboundStat = t.type({
 const OutboundStat = t.type({
   type: t.literal('outbound-rtp'),
   bytesSent: t.number,
+});
+
+const PartialStat = t.partial({
+  jitter: t.number,
+  frameWidth: t.number,
+  frameHeight: t.number,
+  packetsLost: t.number,
 });
 
 const CommonStat = t.intersection([
@@ -60,7 +81,7 @@ const StatEntry = t.type({
   profileId: t.string,
   sessionId: t.string,
   conferenceId: t.string,
-  stats: t.array(CommonStat),
+  stats: t.array(t.intersection([CommonStat, PartialStat])),
 });
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -85,23 +106,73 @@ export const validateStatEntry = (data: any): TypeValidation<StatEntry> => {
 export const createEntries = (
   entries: StatEntry,
   now: number,
-): ElasticStatEntry[] => entries.stats.map((e) => ({
-  tan: entries.tan,
-  conference: {
-    id: entries.conferenceId,
-  },
-  profile: {
-    id: entries.profileId,
-  },
-  session: {
-    id: entries.sessionId,
-  },
-  stat: {
-    id: e.id,
-    type: e.type,
-    kind: e.kind,
-    bytes: e.type === 'inbound-rtp' ? e.bytesReceived : e.bytesSent,
-    timestamp: e.timestamp,
-  },
-  '@timestamp': now,
-}));
+  ua?: useragent.Details,
+): ElasticStatEntry[] => entries.stats.map((e) => {
+  const entry: ElasticStatEntry = {
+    tan: entries.tan,
+    conference: {
+      id: entries.conferenceId,
+    },
+    profile: {
+      id: entries.profileId,
+    },
+    session: {
+      id: entries.sessionId,
+    },
+    stat: {
+      id: e.id,
+      type: e.type,
+      kind: e.kind,
+      bytes: e.type === 'inbound-rtp' ? e.bytesReceived : e.bytesSent,
+      timestamp: e.timestamp,
+    },
+    '@timestamp': now,
+  };
+
+  if (e.jitter) {
+    entry.stat.jitter = e.jitter;
+  }
+
+  if (e.frameHeight) {
+    if (!entry.stat.frame) {
+      entry.stat.frame = {};
+    }
+    entry.stat.frame.height = e.frameHeight;
+  }
+
+  if (e.frameWidth) {
+    if (!entry.stat.frame) {
+      entry.stat.frame = {};
+    }
+    entry.stat.frame.width = e.frameWidth;
+  }
+
+  if (e.packetsLost) {
+    if (!entry.stat.packets) {
+      entry.stat.packets = {};
+    }
+    entry.stat.packets.lost = e.packetsLost;
+  }
+
+  if (ua) {
+    if (ua.browser) {
+      if (!entry.session.browser) {
+        entry.session.browser = {};
+      }
+      entry.session.browser.name = ua.browser;
+    }
+
+    if (ua.version) {
+      if (!entry.session.browser) {
+        entry.session.browser = {};
+      }
+      entry.session.browser.version = ua.version;
+    }
+
+    if (ua.os) {
+      entry.session.os = ua.os;
+    }
+  }
+
+  return entry;
+});

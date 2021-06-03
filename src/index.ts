@@ -8,6 +8,14 @@ const getStats = async (pc: RTCPeerConnection) => {
   const stats = await pc.getStats(null).then((s) => {
     const items: Record<string, unknown>[] = [];
 
+    const statItems = [
+      'kind',
+      'jitter',
+      'packetsLost',
+      'frameHeight',
+      'frameWidth',
+    ];
+
     s.forEach((report) => {
       const item: Record<string, unknown> = {
         id: report.id,
@@ -16,11 +24,11 @@ const getStats = async (pc: RTCPeerConnection) => {
       };
       Object.keys(report).forEach((statName) => {
         if (report.type === 'inbound-rtp') {
-          if (['bytesReceived', 'kind'].includes(statName)) {
+          if ([...statItems, 'bytesReceived'].includes(statName)) {
             item[statName] = report[statName];
           }
         } else if (report.type === 'outbound-rtp') {
-          if (['bytesSent', 'kind'].includes(statName)) {
+          if ([...statItems, 'bytesSent'].includes(statName)) {
             item[statName] = report[statName];
           }
         }

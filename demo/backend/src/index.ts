@@ -1,4 +1,5 @@
 import express from 'express';
+import useragent from 'express-useragent';
 import cors from 'cors';
 import util from 'util';
 import { Client as ElasticClient } from '@elastic/elasticsearch';
@@ -47,6 +48,7 @@ const sendEntries = async (entries: ElasticStatEntry[], now: number) => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   app.use(cors());
+  app.use(useragent.express());
 
   app.post('/:conference', async (req, res) => {
     const date = new Date();
@@ -66,7 +68,7 @@ const sendEntries = async (entries: ElasticStatEntry[], now: number) => {
 
     const { data } = body;
     const now = Date.now();
-    const entries = createEntries(data, now);
+    const entries = createEntries(data, now, req.useragent);
     await sendEntries(entries, now);
 
     console.log(date, conferenceName, util.inspect(data, false, null, true));
