@@ -38,6 +38,7 @@ export type ElasticStatEntry = {
   };
   profile: {
     id: string;
+    type: string;
   };
   session: {
     id: string;
@@ -79,6 +80,7 @@ const CommonStat = t.intersection([
 const StatEntry = t.type({
   tan: t.string,
   profileId: t.string,
+  profileType: t.string,
   sessionId: t.string,
   conferenceId: t.string,
   stats: t.array(t.intersection([CommonStat, PartialStat])),
@@ -115,6 +117,7 @@ export const createEntries = (
     },
     profile: {
       id: entries.profileId,
+      type: entries.profileType,
     },
     session: {
       id: entries.sessionId,

@@ -31,6 +31,9 @@ export const template = {
         'profile.id': {
           type: 'keyword',
         },
+        'profile.type': {
+          type: 'keyword',
+        },
         'stat.type': {
           type: 'keyword',
         },

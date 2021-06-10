@@ -27,6 +27,9 @@
   <script>
     const backendPostMessageType = 'jitsi-meet-analytics-handler';
 
+    const profileTypes = ['patient', 'doctor'];
+    const profileType = profileTypes[Math.floor(Math.random() * profileTypes.length)];
+
     const randomId = Math.random().toString(16).substr(2, 8);
     console.log('My user ID is: ', randomId);
 
@@ -36,8 +39,8 @@
       width: 700,
       height: 700,
       userInfo: {
-        displayName: "hello",
-        foo: "bar" // not working
+        displayName: 'hello',
+        foo: 'bar' // not working
       },
       parentNode: document.querySelector('#meet')
     };
@@ -51,12 +54,13 @@
           return;
         }
         console.log('got event: ', event);
-        
+
         event.source.postMessage(JSON.stringify({
           type: backendPostMessageType,
           metadata: {
-            tan: "DDDDD",
+            tan: 'DDDDD',
             profileId: randomId,
+            profileType,
           },
           backendUrl: 'http://localhost:3000',
           backendPostMessageType,
