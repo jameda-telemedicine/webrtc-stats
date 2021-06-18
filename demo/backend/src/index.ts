@@ -50,15 +50,13 @@ const sendEntries = async (entries: ElasticStatEntry[], now: number) => {
   app.use(cors());
   app.use(useragent.express());
 
-  app.post('/:conference', async (req, res) => {
+  app.post('/', async (req, res) => {
     const date = new Date();
-    const conferenceName = req.params.conference;
     const body = validateStatEntry(req.body);
 
     if (!body.valid) {
       console.log(
         date,
-        conferenceName,
         '[ERROR]',
         util.inspect({ body: req.body, errors: body.errors }, false, null, true),
       );
@@ -71,14 +69,8 @@ const sendEntries = async (entries: ElasticStatEntry[], now: number) => {
     const entries = createEntries(data, now, req.useragent);
     await sendEntries(entries, now);
 
-    console.log(date, conferenceName, util.inspect(data, false, null, true));
+    console.log(date, util.inspect(data, false, null, true));
     res.send({ success: true });
-  });
-
-  app.post('/', (req, res) => {
-    const date = new Date();
-    console.log(date, '(no room)', req.body);
-    res.status(404).send('You have to specify a room name, like /foo');
   });
 
   app.listen(port, () => {

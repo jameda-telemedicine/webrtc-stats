@@ -1,5 +1,4 @@
 export interface StatisticsInput {
-  room: string,
   metadata: Record<string, unknown>,
   peerConnections: RTCPeerConnection[],
 }
@@ -54,11 +53,9 @@ const getStats = async (pc: RTCPeerConnection) => {
  * @param stats statistics to send.
  */
 export const sendStats = async (backendUrl: string, stats: StatisticsInput): Promise<void> => {
-  const roomName = stats.room;
-
   const pcStats = await Promise.all(stats.peerConnections.map((pc) => getStats(pc)));
 
-  fetch(`${backendUrl}/${roomName}`, {
+  fetch(backendUrl, {
     method: 'POST',
     headers: {
       Accept: 'application/json',

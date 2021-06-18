@@ -199,7 +199,6 @@ export default class JitsiMeetAnalyticsHandler {
     }
 
     const stats: StatisticsInput = {
-      room: roomName,
       metadata: {
         ...this.metadata,
         sessionId: roomInformations?.user?.id,
