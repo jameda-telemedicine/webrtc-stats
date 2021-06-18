@@ -23,13 +23,11 @@ To stop and remove the stack, use: `docker-compose down`.
 
 Here is the list of all components used in this demo.
 
-### `static`
-
-This serves the builded files from the library and expose them using the 5000 port.
-
 ### `iframe`
 
 This is a simple HTML page that use the external API of Jitsi Meet to display an instance of it into an iframe.
+
+It also serves the builded file for the library.
 
 It is configured to pass some data to the analytics handler included with this project.
 

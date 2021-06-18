@@ -11,3 +11,8 @@ if [ -n "${JITSI_URL}" ]; then
   echo "Replacing Jitsi Meet URL…"
   sed -i 's|https://localhost:8443|'"${JITSI_URL}"'|g' "${INDEX_FILE}"
 fi
+
+if [ -n "${JITSI_DOMAIN}" ]; then
+  echo "Replacing Jitsi Meet domain…"
+  sed -i 's|localhost:8443|'"${JITSI_DOMAIN}"'|g' "${INDEX_FILE}"
+fi

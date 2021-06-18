@@ -544,7 +544,7 @@ var config = {
 
       // Array of script URLs to load as lib-jitsi-meet "analytics handlers".
       scriptURLs: [
-        "http://localhost:5000/JitsiMeetAnalyticsHandler.min.js"
+        "http://localhost:5001/JitsiMeetAnalyticsHandler.min.js"
       //      "libs/analytics-ga.min.js", // google-analytics
       //      "https://example.com/my-custom-analytics.js"
       ],

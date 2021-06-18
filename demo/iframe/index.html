@@ -1,72 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jitsi Meet Statistics Demo</title>
-  <style>
-    body {
-      background-color: #212121;
-      color: #fff;
-      font-family: Arial, Helvetica, sans-serif;
-      text-align: center;
-    }
-    a {
-      color: #fff;
-      font-style: italic;
-      text-decoration: underline;
-    }
-  </style>
-</head>
-<body>
-  <h1>Jitsi Meet Statistics Demo</h1>
-  <div id="meet"></div>
-  <p>If you are not seeing the iframe with a Jitsi Meet instance, please open <a href="https://localhost:8443/external_api.js" target="_blank">https://localhost:8443/external_api.js</a> and accept the default certificate, then refresh this page.</p>
-  <script src="https://localhost:8443/external_api.js"></script>
-  <script>
-    const backendPostMessageType = 'jitsi-meet-analytics-handler';
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jitsi Meet Statistics Demo</title>
+    <style>
+      body {
+        background-color: #212121;
+        color: #fff;
+        font-family: Arial, Helvetica, sans-serif;
+        text-align: center;
+      }
+      a {
+        color: #fff;
+        font-style: italic;
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Jitsi Meet Statistics Demo</h1>
+    <div id="meet"></div>
+    <p>
+      If you are not seeing the iframe with a Jitsi Meet instance, please open
+      <a href="https://localhost:8443/external_api.js" target="_blank"
+        >https://localhost:8443/external_api.js</a
+      >
+      and accept the default certificate, then refresh this page.
+    </p>
 
-    const profileTypes = ['patient', 'doctor'];
-    const profileType = profileTypes[Math.floor(Math.random() * profileTypes.length)];
+    <script src="https://localhost:8443/external_api.js"></script>
+    <script>
+      const backendPostMessageType = "jitsi-meet-analytics-handler";
+      const hash = window.location.hash.replace("#", "");
 
-    const randomId = Math.random().toString(16).substr(2, 8);
-    console.log('My user ID is: ', randomId);
+      const profileTypes = ["patient", "doctor"];
+      const profileType =
+        profileTypes[Math.floor(Math.random() * profileTypes.length)];
 
-    const domain = 'localhost:8443';
-    const options = {
-      roomName: 'jitsi-meet-demo',
-      width: 700,
-      height: 700,
-      userInfo: {
-        displayName: 'hello',
-        foo: 'bar' // not working
-      },
-      parentNode: document.querySelector('#meet')
-    };
-    const api = new JitsiMeetExternalAPI(domain, options);
+      const randomId = Math.random().toString(16).substr(2, 8);
+      console.log("My user ID is: ", randomId);
 
-    // https://developer.mozilla.org/fr/docs/Web/API/Window/postMessage
-    window.addEventListener('message', (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (!data.type || data.type !== backendPostMessageType) {
-          return;
-        }
-        console.log('got event: ', event);
+      const domain = "localhost:8443";
+      const options = {
+        roomName: hash || "jitsi-meet-demo",
+        width: 700,
+        height: 700,
+        userInfo: {
+          displayName: "hello",
+          foo: "bar", // not working
+        },
+        parentNode: document.querySelector("#meet"),
+      };
+      const api = new JitsiMeetExternalAPI(domain, options);
 
-        event.source.postMessage(JSON.stringify({
-          type: backendPostMessageType,
-          metadata: {
-            tan: 'DDDDD',
-            profileId: randomId,
-            profileType,
-          },
-          backendUrl: 'http://localhost:3000',
-          backendPostMessageType,
-        }), event.origin);
-      } catch (e) {}
-    });
-  </script>
-</body>
+      // https://developer.mozilla.org/fr/docs/Web/API/Window/postMessage
+      window.addEventListener("message", (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (!data.type || data.type !== backendPostMessageType) {
+            return;
+          }
+          console.log("got event: ", event);
+
+          event.source.postMessage(
+            JSON.stringify({
+              type: backendPostMessageType,
+              metadata: {
+                tan: "DDDDD",
+                profileId: randomId,
+                profileType,
+              },
+              backendUrl: "http://localhost:3000",
+              backendPostMessageType,
+            }),
+            event.origin
+          );
+        } catch (e) {}
+      });
+    </script>
+  </body>
 </html>

@@ -1,21 +1,16 @@
 version: "3"
 
 services:
-  # serve static files (Jitsi Meet analytics handler)
-  static:
-    build: ./static
-    restart: unless-stopped
-    ports:
-      - 5000:5000
-    volumes:
-      - ../dist:/app
-
   # iframe with Jitsi Meet inside
   iframe:
     build: ./iframe
     restart: unless-stopped
     ports:
       - 5001:80
+    environment:
+      - BACKEND_URL=http://localhost:3000
+      - JITSI_URL=https://localhost:8443
+      - JITSI_DOMAIN=localhost:8443
 
   # backend collecting statistics
   backend:

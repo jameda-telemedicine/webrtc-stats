@@ -1,3 +1,4 @@
 node_modules/
 dist/
 demo/iframe/JitsiMeetAnalyticsHandler.js
+demo/iframe/JitsiMeetAnalyticsHandler.min.js

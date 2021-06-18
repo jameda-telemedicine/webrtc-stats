@@ -46,6 +46,13 @@ export default [
         sourcemap: false,
         name: 'JitsiMeetAnalyticsHandler',
       },
+      {
+        file: 'demo/iframe/JitsiMeetAnalyticsHandler.min.js',
+        plugins: [terser()],
+        format: 'iife',
+        sourcemap: false,
+        name: 'JitsiMeetAnalyticsHandler',
+      },
     ],
     plugins: [
       resolve({ extensions }),
