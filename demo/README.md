@@ -35,7 +35,7 @@ It is listening on the 5001 port.
 
 ### `backend`
 
-A simple application that get statistics sent using a `POST` request to `/conference_name` where `conference_name` is the name of the Jitsi Meet conference.
+A simple application that get statistics sent using a `POST` request to `/`.
 
 Statistics are displayed in the logs.
 To access them when the stack is running, you can use `docker-compose logs -f backend`.

@@ -40,6 +40,9 @@ export const template = {
         'session.id': {
           type: 'keyword',
         },
+        'session.domain': {
+          type: 'keyword',
+        },
         'stat.timestamp': {
           format: 'strict_date_optional_time||epoch_millis',
           type: 'date_nanos',

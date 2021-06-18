@@ -13,7 +13,7 @@ npm run serve # expose all files from the dist directory on http://localhost:500
 
 This projects also generate a custom analytics handler for Jitsi Meet, that sends statistics to a specific backend.
 
-This assumes that your backend is reachable under http://localhost:3000, and accepts `POST` requests to `/room`, where `room` is the name of a Jitsi Meet room.
+This assumes that your backend is reachable under http://localhost:3000, and accepts `POST` requests to `/`.
 
 Here are the required steps if you want to try it live on your machine.
 

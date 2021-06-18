@@ -207,6 +207,10 @@ export default class JitsiMeetAnalyticsHandler {
       peerConnections,
     };
 
+    if (!stats.metadata.domain) {
+      stats.metadata.domain = window.location.host;
+    }
+
     if (window.parent.location !== window.location) {
       window.parent.postMessage(JSON.stringify({
         type: this.backendPostMessageType,

@@ -42,6 +42,7 @@ export type ElasticStatEntry = {
   };
   session: {
     id: string;
+    domain: string;
     browser?: {
       name?: string;
       version?: string;
@@ -83,6 +84,7 @@ const StatEntry = t.type({
   profileType: t.string,
   sessionId: t.string,
   conferenceId: t.string,
+  domain: t.string,
   stats: t.array(t.intersection([CommonStat, PartialStat])),
 });
 
@@ -121,6 +123,7 @@ export const createEntries = (
     },
     session: {
       id: entries.sessionId,
+      domain: entries.domain,
     },
     stat: {
       id: e.id,
