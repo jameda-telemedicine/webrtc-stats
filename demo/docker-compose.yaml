@@ -32,8 +32,9 @@ services:
     volumes:
       - ./volumes/web:/config:Z
       - ./volumes/transcripts:/usr/share/jitsi-meet/transcripts:Z
-      - ./jitsi/config.js:/defaults/config.js:ro
     env_file: .env.jitsi
+    environment:
+      - ANALYTICS_SCRIPT_URLS=http://localhost:5001/JitsiMeetAnalyticsHandler.min.js
     networks:
       meet.jitsi:
         aliases:
