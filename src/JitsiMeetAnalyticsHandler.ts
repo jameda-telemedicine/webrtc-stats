@@ -118,6 +118,8 @@ export default class JitsiMeetAnalyticsHandler {
 
   backendPostMessageType: string;
 
+  statsInterval: number;
+
   /**
      * Creates new instance of the custom handler.
      *
@@ -135,10 +137,11 @@ export default class JitsiMeetAnalyticsHandler {
     this.sessionIdWarningSent = false;
     this.backendUrl = undefined;
     this.backendPostMessageType = 'jitsi-meet-analytics-handler';
+    this.statsInterval = 10000;
 
     this._statsInterval = window.setInterval(() => {
       this._sendStats();
-    }, 2000);
+    }, this.statsInterval);
 
     console.info('Successfully loaded JitsiMeetAnalyticsHandler.');
 
@@ -155,6 +158,14 @@ export default class JitsiMeetAnalyticsHandler {
 
         if (data.backendUrl) {
           this.backendUrl = data.backendUrl;
+        }
+
+        if (data.statsInterval && data.statsInterval !== this.statsInterval) {
+          clearInterval(this._statsInterval);
+          this.statsInterval = data.statsInterval;
+          this._statsInterval = window.setInterval(() => {
+            this._sendStats();
+          }, this.statsInterval);
         }
 
         if (data.backendPostMessageType) {
