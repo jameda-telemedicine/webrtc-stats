@@ -137,7 +137,7 @@ export default class JitsiMeetAnalyticsHandler {
     this.sessionIdWarningSent = false;
     this.backendUrl = undefined;
     this.backendPostMessageType = 'jitsi-meet-analytics-handler';
-    this.statsInterval = 10000;
+    this.statsInterval = 5_000;
 
     this._statsInterval = window.setInterval(() => {
       this._sendStats();
@@ -171,8 +171,6 @@ export default class JitsiMeetAnalyticsHandler {
         if (data.backendPostMessageType) {
           this.backendPostMessageType = data.backendPostMessageType;
         }
-
-        console.log('IFRAME; got event: ', event);
       } catch (e) {
         // do nothing
       }

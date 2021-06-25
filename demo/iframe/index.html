@@ -62,7 +62,6 @@
           if (!data.type || data.type !== backendPostMessageType) {
             return;
           }
-          console.log("got event: ", event);
 
           event.source.postMessage(
             JSON.stringify({
